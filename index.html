@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SHIFT0 Log — Diario de Claves</title>
+    <style>
+        :root {
+            --bg-color: #030a16;
+            --card-bg: #0a172c;
+            --panel-bg: #051020;
+            --primary-blue: #00d2ff;
+            --text-light: #64b5f6;
+            --text-white: #ffffff;
+            --border-color: #1a365d;
+            --accent-red: #ff3366;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-white);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 900px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        h1 {
+            color: var(--primary-blue);
+            font-size: 2.4rem;
+            letter-spacing: 3px;
+            text-shadow: 0 0 10px rgba(0, 210, 255, 0.4);
+        }
+
+        .subtitle {
+            color: var(--text-light);
+            font-size: 0.9rem;
+            letter-spacing: 1.5px;
+            margin-top: 5px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+
+        @media (min-width: 768px) {
+            .grid {
+                grid-template-columns: 350px 1fr;
+            }
+        }
+
+        .panel {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+        }
+
+        h2 {
+            color: var(--text-light);
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 6px;
+        }
+
+        .form-group {
+            margin-bottom: 12px;
+        }
+
+        label {
+            display: block;
+            color: var(--text-light);
+            font-size: 0.8rem;
+            font-weight: bold;
+            margin-bottom: 4px;
+        }
+
+        input, select {
+            width: 100%;
+            background-color: var(--panel-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 5px;
+            color: var(--text-white);
+            padding: 8px 10px;
+            font-size: 0.9rem;
+            outline: none;
+        }
+
+        input:focus, select:focus {
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 5px rgba(0, 210, 255, 0.4);
+        }
+
+        button {
+            width: 100%;
+            background-color: #0d2847;
+            color: var(--text-light);
+            border: 1px solid var(--primary-blue);
+            padding: 10px;
+            border-radius: 5px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-top: 8px;
+        }
+
+        button:hover {
+            background-color: var(--primary-blue);
+            color: #030a16;
+            box-shadow: 0 0 10px rgba(0, 210, 255, 0.4);
+        }
+
+        .log-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+        }
+
+        .log-table th {
+            text-align: left;
+            color: var(--primary-blue);
+            border-bottom: 1px solid var(--border-color);
+            padding: 8px;
+            font-size: 0.8rem;
+        }
+
+        .log-table td {
+            padding: 10px 8px;
+            border-bottom: 1px solid rgba(26, 54, 93, 0.5);
+            vertical-align: middle;
+        }
+
+        .code-tag {
+            font-family: monospace;
+            color: var(--primary-blue);
+            background: rgba(0, 210, 255, 0.1);
+            padding: 2px 6px;
+            border-radius: 4px;
+            border: 1px solid rgba(0, 210, 255, 0.2);
+            word-break: break-all;
+        }
+
+        .category-badge {
+            font-size: 0.7rem;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-weight: bold;
+            background: #1a365d;
+            color: var(--text-light);
+        }
+
+        .actions-cell {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+        }
+
+        .btn-copy {
+            background: transparent;
+            border: 1px solid var(--primary-blue);
+            color: var(--primary-blue);
+            padding: 4px 8px;
+            font-size: 0.75rem;
+            margin: 0;
+            width: auto;
+        }
+
+        .btn-copy:hover {
+            background: var(--primary-blue);
+            color: #030a16;
+        }
+
+        .btn-delete {
+            background: transparent;
+            border: 1px solid var(--accent-red);
+            color: var(--accent-red);
+            padding: 4px 8px;
+            font-size: 0.75rem;
+            margin: 0;
+            width: auto;
+        }
+
+        .btn-delete:hover {
+            background: var(--accent-red);
+            color: #ffffff;
+            box-shadow: 0 0 8px rgba(255, 51, 102, 0.4);
+        }
+
+        .search-bar {
+            margin-bottom: 15px;
+        }
+
+        .empty-msg {
+            text-align: center;
+            color: var(--text-light);
+            padding: 20px;
+            font-style: italic;
+            font-size: 0.85rem;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <h1>SHIFT0 LOG</h1>
+            <div class="subtitle">DIARIO DE REGISTROS Y NOMBRES EN CLAVE</div>
+        </header>
+
+        <div class="grid">
+            <section class="panel">
+                <h2>NUEVA CLAVE</h2>
+                
+                <div class="form-group">
+                    <label>CONCEPTO REAL</label>
+                    <input type="text" id="real-name" placeholder="Escribe el nombre real...">
+                </div>
+
+                <div class="form-group">
+                    <label>ALIAS EN CLAVE</label>
+                    <input type="text" id="alias-name" placeholder="Nombre en clave...">
+                </div>
+
+                <div class="form-group">
+                    <label>CATEGORÍA</label>
+                    <select id="category">
+                        <option value="Sujeto / Persona">Sujeto / Persona</option>
+                        <option value="Ubicación / Lugar">Ubicación / Lugar</option>
+                        <option value="Operación / Evento">Operación / Evento</option>
+                        <option value="Objeto / Tarea">Objeto / Tarea</option>
+                    </select>
+                </div>
+
+                <button onclick="guardarClave()">Registrar en Diario</button>
+            </section>
+
+            <section class="panel">
+                <h2>REGISTROS DEL GRUPO</h2>
+                <div class="search-bar">
+                    <input type="text" id="search" placeholder="Buscar por concepto o alias..." onkeyup="filtrarTabla()">
+                </div>
+
+                <table class="log-table">
+                    <thead>
+                        <tr>
+                            <th>CONCEPTO</th>
+                            <th>ALIAS & CÓDIGO SHIFT0</th>
+                            <th>CAT.</th>
+                            <th>ACCIONES</th>
+                        </tr>
+                    </thead>
+                    <tbody id="log-body">
+                    </tbody>
+                </table>
+            </section>
+        </div>
+    </div>
+
+    <script>
+        const ALFABETO = "ABCDEFGHIJKLMNÑOPQRSTUVWXYZ";
+        let registros = [];
+
+        function codificarTexto(texto) {
+            let res = "";
+            let limpio = texto.toUpperCase().replace(/[^A-ZÑ0-9]/g, '');
+            for (let char of limpio) {
+                if (ALFABETO.includes(char)) {
+                    let idx = ALFABETO.indexOf(char);
+                    let posOriginal = idx + 1;
+                    let posDesplazada = (posOriginal % 27) + 1;
+                    let val = posDesplazada + 3;
+                    res += String(val).padStart(5, '0');
+                } else {
+                    res += char;
+                }
+            }
+            return res;
+        }
+
+        function renderTabla(filtro = "") {
+            const tbody = document.getElementById('log-body');
+            tbody.innerHTML = "";
+
+            const filtrados = registros.map((item, originalIndex) => ({ ...item, originalIndex }))
+                .filter(item => 
+                    item.real.toLowerCase().includes(filtro.toLowerCase()) || 
+                    item.alias.toLowerCase().includes(filtro.toLowerCase())
+                );
+
+            if (filtrados.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="4" class="empty-msg">No hay registros almacenados. ¡Añade tu primera clave!</td></tr>`;
+                return;
+            }
+
+            filtrados.forEach((item) => {
+                let codigoShift0 = codificarTexto(item.alias);
+                let row = document.createElement('tr');
+
+                row.innerHTML = `
+                    <td><strong>${item.real}</strong></td>
+                    <td>
+                        <div>${item.alias}</div>
+                        <div class="code-tag">${codigoShift0}</div>
+                    </td>
+                    <td><span class="category-badge">${item.cat.split(' ')[0]}</span></td>
+                    <td>
+                        <div class="actions-cell">
+                            <button class="btn-copy" onclick="copiarCodigo('${codigoShift0}')">Copiar</button>
+                            <button class="btn-delete" onclick="eliminarClave(${item.originalIndex})">Borrar</button>
+                        </div>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        function guardarClave() {
+            const realInput = document.getElementById('real-name');
+            const aliasInput = document.getElementById('alias-name');
+            const catSelect = document.getElementById('category');
+
+            const real = realInput.value.trim();
+            const alias = aliasInput.value.trim();
+            const cat = catSelect.value;
+
+            if (!real || !alias) {
+                alert("Completa el nombre real y el alias en clave.");
+                return;
+            }
+
+            registros.push({ real, alias, cat });
+            realInput.value = "";
+            aliasInput.value = "";
+            renderTabla(document.getElementById('search').value);
+        }
+
+        function eliminarClave(index) {
+            registros.splice(index, 1);
+            renderTabla(document.getElementById('search').value);
+        }
+
+        function filtrarTabla() {
+            const query = document.getElementById('search').value;
+            renderTabla(query);
+        }
+
+        function copiarCodigo(texto) {
+            const temp = document.createElement("textarea");
+            temp.value = texto;
+            document.body.appendChild(temp);
+            temp.select();
+            document.execCommand("copy");
+            document.body.removeChild(temp);
+            alert("¡Código SHIFT0 copiado!");
+        }
+
+        // Cargar tabla inicial vacía
+        window.onload = function() {
+            renderTabla();
+        };
+    </script>
+</body>
+</html>
